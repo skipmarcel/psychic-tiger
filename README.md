@@ -41,3 +41,16 @@ src/
 - **Phone & email**: not yet on the Contact page.
 - **Copy**: Home "Mi Casa Su Casa" block and About still mention the garage gym near the St. Johns Bridge; the gym is now at 1500 NW 17th Ave.
 - **Hosting**: uses `BrowserRouter`; configure SPA fallback (all routes → index.html) on the host.
+
+## Content editing (Sanity)
+
+Jordan edits hero photos, page text, services/pricing and the gym address in Sanity Studio (`studio/`).
+The site fetches published content on load and falls back to `src/content/defaults.js` if Sanity is unreachable.
+
+```bash
+cd studio
+npm install
+npm run dev      # local Studio at http://localhost:3333
+npm run deploy   # publish Studio to https://psychic-tiger.sanity.studio
+npx sanity exec scripts/seed.js --with-user-token   # one-time import of current content
+```

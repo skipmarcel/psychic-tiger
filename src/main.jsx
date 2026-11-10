@@ -1,11 +1,14 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
+import { ContentProvider } from './content/ContentProvider.jsx';
 import './styles/modernist.css';
 import './styles/global.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <App />
+    <ContentProvider>
+      <App />
+    </ContentProvider>
   </React.StrictMode>
 );

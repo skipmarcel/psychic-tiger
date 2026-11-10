@@ -2,9 +2,11 @@ import { Link } from 'react-router-dom';
 import LogoDraw from './Logo/LogoDraw.jsx';
 import PillButton from './PillButton.jsx';
 import GymMap from './GymMap.jsx';
-import { GYM, NAV } from '../data/site.js';
+import { NAV } from '../data/site.js';
+import { useContent } from '../content/ContentProvider.jsx';
 
 export default function Footer() {
+  const { settings: gym } = useContent();
   return (
     <footer style={{ background: 'var(--color-text)', color: 'var(--color-bg)', padding: 'clamp(48px,6vw,88px) var(--pad-x) clamp(24px,3vw,40px)', display: 'flex', flexDirection: 'column', gap: 'clamp(40px,6vw,88px)' }}>
       <div className="auto-grid" style={{ gap: 'clamp(32px,5vw,72px)', alignItems: 'stretch' }}>
@@ -18,9 +20,9 @@ export default function Footer() {
               {NAV.map((n) => <Link key={n.to} to={n.to} className="nav-link" style={{ color: 'inherit' }}>{n.label}</Link>)}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8, fontSize: 15, lineHeight: 1.5, maxWidth: 260 }}>
-              <div className="label">{GYM.name}</div>
-              <div>{GYM.addressLine1}<br />{GYM.addressLine2}</div>
-              <a href={GYM.mapsUrl} target="_blank" rel="noopener noreferrer" className="small-link" style={{ marginTop: 4, color: 'inherit' }}>Get directions</a>
+              <div className="label">{gym.gymName}</div>
+              <div>{gym.addressLine1}<br />{gym.addressLine2}</div>
+              <a href={gym.mapsUrl} target="_blank" rel="noopener noreferrer" className="small-link" style={{ marginTop: 4, color: 'inherit' }}>Get directions</a>
             </div>
           </div>
         </div>
