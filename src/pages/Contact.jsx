@@ -1,18 +1,35 @@
 import { useState } from 'react';
-import { GYM } from '../data/site.js';
+import { GYM, FORMSPREE_URL } from '../data/site.js';
 
 const CHOICES = ['Personal training', 'Nutrition', 'Remote programming', 'Group / party'];
 const input = { minHeight: 44, fontSize: 16 };
 
 export default function Contact() {
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState('');
 
   const submit = async (e) => {
     e.preventDefault();
-    const data = Object.fromEntries(new FormData(e.currentTarget));
-    // TODO: send `data` to a form backend (Formspree, Netlify Forms, a serverless function, etc.)
-    console.log('contact form', data);
-    setSent(true);
+    setSending(true);
+    setError('');
+    try {
+      const res = await fetch(FORMSPREE_URL, {
+        method: 'POST',
+        body: new FormData(e.currentTarget),
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.errors?.map((x) => x.message).join(' ') || 'Request failed');
+      }
+      setSent(true);
+    } catch (err) {
+      console.error('contact form', err);
+      setError('Sorry, your message didn’t send. Please try again in a moment.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -25,6 +42,9 @@ export default function Contact() {
 
         {!sent ? (
           <form onSubmit={submit} style={{ display: 'flex', flexDirection: 'column', gap: 18, maxWidth: 560 }}>
+            <input type="hidden" name="_subject" value="New message from psychictiger.com" />
+            {/* Spam trap: hidden from people, bots fill it in and Formspree drops the submission. */}
+            <input type="text" name="_gotcha" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ display: 'none' }} />
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 18 }}>
               <div className="field"><label htmlFor="f-name">Name</label><input id="f-name" name="name" className="input" required style={input} /></div>
               <div className="field"><label htmlFor="f-email">Email</label><input id="f-email" name="email" type="email" className="input" required style={input} /></div>
@@ -39,7 +59,8 @@ export default function Contact() {
               </div>
             </div>
             <div className="field"><label htmlFor="f-msg">Message</label><textarea id="f-msg" name="message" className="input" style={{ minHeight: 140, fontSize: 16 }} /></div>
-            <div><button type="submit" className="pill">Send</button></div>
+            {error && <p role="alert" style={{ margin: 0, fontSize: 16 }}>{error}</p>}
+            <div><button type="submit" className="pill" disabled={sending} style={{ opacity: sending ? 0.5 : 1 }}>{sending ? 'Sending…' : 'Send'}</button></div>
           </form>
         ) : (
           <div style={{ borderTop: '2px solid var(--color-divider)', paddingTop: 24, maxWidth: 560, display: 'flex', flexDirection: 'column', gap: 8 }}>
